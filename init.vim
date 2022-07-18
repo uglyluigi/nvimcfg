@@ -7,7 +7,6 @@ Plug 'nvim-telescope/telescope.nvim'
 Plug 'neoclide/coc.nvim', {'branch': 'release'}
 Plug 'https://github.com/windwp/nvim-autopairs'
 Plug 'luochen1990/rainbow'
-Plug 'sbdchd/neoformat'
 Plug 'norcalli/nvim-colorizer.lua'
 Plug 'ur4ltz/surround.nvim'
 Plug 'djoshea/vim-autoread'
@@ -16,12 +15,16 @@ Plug 'https://github.com/joshdick/onedark.vim'
 Plug 'sheerun/vim-polyglot'
 Plug 'EdenEast/nightfox.nvim'
 Plug 'akinsho/bufferline.nvim'
-Plug 'startup-nvim/startup.nvim'
-Plug 'nvim-telescope/telescope-live-grep-raw.nvim'
+Plug 'nvim-telescope/telescope-live-grep-args.nvim'
 Plug 'nvim-telescope/telescope-file-browser.nvim'
+Plug 'akinsho/toggleterm.nvim'
+Plug 'wellle/context.vim'
+Plug 'wadackel/vim-dogrun'
+Plug 'szebniok/tree-sitter-wgsl'
+Plug 'elixir-editors/vim-elixir'
 call plug#end()
 
-colorscheme nightfox
+colorscheme dogrun
 set number " Line numbers
 set noshowmode " Remove mode from under status bar
 set relativenumber " Turns on relative line numbers by default
@@ -31,6 +34,7 @@ set tabstop=4
 set shiftwidth=4
 set expandtab
 set termguicolors
+set hidden
 
 " Highlight current line in active buffer only
 augroup CursorLine
@@ -57,23 +61,40 @@ let g:rainbow_conf = {
             \    'guifgs': ['#F1E8B8', '#2EC4B6', '#7067CF', '#F25F5C'],
             \}
 
+let g:context_add_mappings = 0
+
+set shm+=I
+
 let g:neoformat_try_node_exe = 1 
-" nnoremap <silent> L :tabnext<CR>
-" nnoremap <silent> h :tabprevious<cr>
+let &shell='/opt/homebrew/bin/bash --rcfile /Users/uglyluigi/.bashrc'
 " barbar stuff
 
-nnoremap <silent> L :BufferLineCycleNext<cr>
-nnoremap <silent> H :BufferLineCyclePrev<cr>
+noremap <silent> L :BufferLineCycleNext<cr>
+noremap <silent> H :BufferLineCyclePrev<cr>
 
 " Telescope commands
 nnoremap <leader>ff <cmd>Telescope find_files<cr>
 nnoremap <leader>fg <cmd>Telescope live_grep<cr>
-nnoremap <leader>fb <cmd>Telescope buffers<cr>
+nnoremap <leader>fb <cmd>Telescope file_browser<cr>
 nnoremap <leader>fh <cmd>Telescope help_tags<cr>
 nnoremap <leader><Up> <C-w><Up>
 nnoremap <leader><Down> <C-w><Down>
 nnoremap <leader><Left> <C-w><Left>
 nnoremap <leader><Right> <C-w><Right>
+nnoremap <silent> <leader>pb :BufferLineTogglePin<cr>
+nnoremap <leader>= <C-w>=
+nnoremap <C-`> :ToggleTerm<cr>
+nnoremap <leader>cb :BufferLinePickClose<cr>
+nnoremap <leader>cl :BufferLineCloseLeft<cr>
+nnoremap <leader>cr :BufferLineCloseRight<cr>
+
+inoremap <expr> <cr> pumvisible() ? "\<C-y>" : "\<C-g>u\<CR>"
+inoremap <s-cr> <Esc>o
+
+map J 5j
+map K 5k
+map E ea
+map Q A;<Esc>
 
 tnoremap <Esc> <C-\><C-n>
 " Push escape to remove highlighting after search, substitution, etc.
@@ -84,10 +105,11 @@ lua << END
 require('lualine').setup {
     options = {
         icons_enabled = true,
-        theme = 'nightfox',
+        theme = 'auto',
         component_separators = { left = '', right = ''},
         section_separators = { left = '', right = ''},
     },
+
     sections = {
         lualine_a = {'mode'},
         lualine_b = {'filename'}, 
@@ -99,7 +121,7 @@ require('lualine').setup {
 }
 
 telescope = require('telescope')
-telescope.load_extension("live_grep_raw")
+telescope.load_extension("live_grep_args")
 telescope.load_extension("file_browser")
 telescope.setup{ 
     defaults = { 
@@ -119,12 +141,25 @@ require('surround').setup {}
 require('bufferline').setup {
     options = {
         separator_style = 'slant',
+        close_icon = '',
+        buffer_close_icon = '',
     }
 }
 
-require('startup').setup {
-    theme = 'dashboard',
+require("toggleterm").setup {
+    direction = 'float',
+    shell = vim.o.shell,
+    persist_mode = false,
+
+    float_opts = {
+        border = 'curved',
+        width = 85,
+        height = 25,
+        winblend = 3,
+    }
 }
+
+
 END
 
 
@@ -193,7 +228,7 @@ nmap <silent> gi <Plug>(coc-implementation)
 nmap <silent> gr <Plug>(coc-references)
 
 " Use K to show documentation in preview window.
-nnoremap <silent> K :call ShowDocumentation()<CR>
+nnoremap <silent> <C-Space> :call ShowDocumentation()<CR>
 
 function! ShowDocumentation()
   if CocAction('hasProvider', 'hover')
@@ -224,8 +259,8 @@ augroup end
 
 " Applying codeAction to the selected region.
 " Example: `<leader>aap` for current paragraph
-xmap <leader>a  <Plug>(coc-codeaction-selected)
-nmap <leader>a  <Plug>(coc-codeaction-selected)
+xmap <leader>a  <Plug>(coc-codeaction-cursor)
+nmap <leader>a  <Plug>(coc-codeaction-cursor)
 
 " Remap keys for applying codeAction to the current buffer.
 nmap <leader>ac  <Plug>(coc-codeaction)
