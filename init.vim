@@ -48,7 +48,7 @@ augroup NumberToggleCmd
     autocmd CmdlineLeave * if &l:number != "number" || &l:relativenumber != "relativenumber" | set relativenumber|set nonumber|redraw | endif
 augroup END
 
-let mapleader = "!" " The leader used for Telescope commands and barbar bindings
+let mapleader = "." " The leader used for Telescope commands and barbar bindings
 let g:rainbow_active = 1
 let g:rainbow_conf = {
             \    'guifgs': ['#F1E8B8', '#2EC4B6', '#7067CF', '#F25F5C'],
@@ -111,10 +111,6 @@ telescope.load_extension("file_browser")
 telescope.setup{ 
     defaults = { 
         file_ignore_patterns = {"node_modules", "target"},
-        layout_strategy = 'vertical',
-        layout_config = {
-            vertical = {width = 0.5}
-        },
         initial_mode = 'normal',
     },
 }
@@ -141,18 +137,9 @@ require("gitsigns").setup {}
 
 END
 
-
 function OpenConfig()
     e ~/.config/nvim/init.vim
 endfunction
-
-" COC STUFF
-" Set internal encoding of vim, not needed on neovim, since coc.nvim using some
-" unicode characters in the file autoload/float.vim
-set encoding=utf-8
-
-" TextEdit might fail if hidden is not set.
-set hidden
 
 " Some servers have issues with backup files, see #649.
 set nobackup
